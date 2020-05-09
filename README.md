@@ -20,6 +20,15 @@ If you're having `empty response` issues, make sure your docker instance has 6gb
 curl -F "data=@test.jpg" http://localhost:8080 -o result.png
 ```
 
+# Deploy on Google App Engine
+
+Create an App Engine application. [Instructions](https://cloud.google.com/appengine/docs/flexible/custom-runtimes/managing-projects-apps-billing#create)
+
+Deploy your code:
+```bash
+gcloud app deploy --project=<YOUR_GCP_PROJECT>
+```
+
 # Development
 
 - Clone this repository: `git clone https://github.com/cyrildiagne/BASNet-http.git`

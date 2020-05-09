@@ -21,7 +21,7 @@ RUN pip install -r requirements.txt
 COPY *.py ./
 
 # Set default port.
-ENV PORT 80
+ENV PORT 8080
 
 # Run the web service using gunicorn.
 CMD exec gunicorn --bind :$PORT --workers 1 main:app

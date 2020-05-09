@@ -20,7 +20,21 @@ CORS(app)
 # Simple probe.
 @app.route('/', methods=['GET'])
 def hello():
-    return 'Hello BASNet!'
+    return """
+<!doctype html>
+<head>
+    <title>Upload image</title>
+</head>
+<body>
+    <h1>Upload image</h1>
+    <form method="POST" enctype="multipart/form-data">
+        <p><input type="file" name="data"></p>
+        <p><input type="checkbox" id="mask" name="mask" value="true"><label for="mask"> Mask only</label></p>
+        <p><input type="submit" value="Get image"></p>
+    </form>
+</body>
+</html>
+"""
 
 
 # Route http posts to this method
@@ -35,19 +49,31 @@ def run():
     if len(data) == 0:
         return jsonify({'error': 'empty image'}), 400
 
+    return_mask_only = request.form.get('mask', 'false') == 'true'
+
     # Convert string data to PIL Image
     img = Image.open(io.BytesIO(data))
+    original_size = img.size
 
-    # Ensure i,qge size is under 1024
+    # Ensure image size is under 1024
     if img.size[0] > 1024 or img.size[1] > 1024:
         img.thumbnail((1024, 1024))
 
     # Process Image
     res = basnet.run(np.array(img))
+    mask = res.resize(original_size).convert("L")
+    output_img = mask
+
+    # Apply mask if needed
+    if not return_mask_only:
+        ref = Image.open(io.BytesIO(data))
+        empty = Image.new("RGBA", ref.size, 0)
+        applied_mask = Image.composite(ref, empty, mask)
+        output_img = applied_mask
 
     # Save to buffer
     buff = io.BytesIO()
-    res.save(buff, 'PNG')
+    output_img.save(buff, 'PNG')
     buff.seek(0)
 
     # Print stats
