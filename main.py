@@ -23,7 +23,7 @@ def hello():
     return """
 <!doctype html>
 <head>
-    <title>Upload image</title>
+    <title>BASNet</title>
 </head>
 <body>
     <h1>Upload image</h1>
@@ -80,7 +80,12 @@ def run():
     logging.info(f'Completed in {time.time() - start:.2f}s')
 
     # Return data
-    return send_file(buff, mimetype='image/png')
+    return send_file(
+        buff,
+        mimetype='image/png',
+        as_attachment=True,
+        attachment_filename='output.png'
+    )
 
 
 if __name__ == '__main__':
